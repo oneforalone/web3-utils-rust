@@ -21,6 +21,14 @@ fn get_oracle_feeds(token: &str) -> (String, String) {
     (addr.to_string(), abi.to_string())
 }
 
+fn load_abi_json(json_file: &str) -> String {
+    let mut file = File::open(json_file).unwrap();
+    let mut json_str = String::new();
+    file.read_to_string(&mut json_str).unwrap();
+
+    json_str
+}
+
 async fn get_price(token: &str) -> f64 {
     let wss = "wss://mainnet.infura.io/ws/v3/48c4fb93a3794a1fb80da6c53226db1c";
     let websocket = WebSocket::new(wss).await.unwrap();
@@ -32,9 +40,7 @@ async fn get_price(token: &str) -> f64 {
 
     // get abi, cause include_bytes!() need take a string literal,
     // the macro works at compile time, can not take a variable as parameter
-    let mut abi_json = File::open(abi_file).unwrap();
-    let mut abi_str = String::new();
-    abi_json.read_to_string(&mut abi_str).unwrap();
+    let abi_str = load_abi_json(abi_file.as_str());
     let abi = abi_str.as_bytes();
 
     let contract = Contract::from_json(web3.eth(), contract_addr, abi).unwrap();
