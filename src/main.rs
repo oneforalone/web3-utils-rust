@@ -33,7 +33,8 @@ async fn get_price(token: &str) -> Result<f64, web3::Error> {
     let websocket = WebSocket::new(wss).await.unwrap();
     let web3 = web3::Web3::new(websocket);
 
-    let (addr, abi_file) = get_oracle_feeds(token).unwrap();
+    // convert the token str to lowercase to avoid typos
+    let (addr, abi_file) = get_oracle_feeds(token.to_lowercase().as_str()).unwrap();
 
     let contract_addr = Address::from_str(addr.as_str()).unwrap();
 
@@ -61,4 +62,59 @@ async fn get_price(token: &str) -> Result<f64, web3::Error> {
 async fn main() {
     let price = get_price("btc").await.unwrap();
     println!("Current Price of BTC is: {}", price);
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_btc_price() {
+        let price: f64 = get_price("BTC").await.unwrap();
+        println!("The price of BTC is: ${}", price);
+        assert!(price >= 29000.0);
+    }
+
+    #[tokio::test]
+    async fn test_eth_price() {
+        let price: f64 = get_price("eth").await.unwrap();
+        println!("The price of ETH is: ${}", price);
+        assert!(price >= 2000.0);
+    }
+
+    #[tokio::test]
+    async fn test_bnb_price() {
+        let price: f64 = get_price("BNB").await.unwrap();
+        println!("The price of BNB is: ${}", price);
+        assert!(price >= 300.0);
+    }
+
+    #[tokio::test]
+    async fn test_usdt_price() {
+        let price: f64 = get_price("usdt").await.unwrap();
+        println!("The price of USDT is: ${}", price);
+        assert!(price >= 0.9);
+    }
+
+    #[tokio::test]
+    async fn test_usdc_price() {
+        let price: f64 = get_price("usdc").await.unwrap();
+        println!("The price of USDC is: ${}", price);
+        assert!(price >= 0.9);
+    }
+
+    #[tokio::test]
+    async fn test_dai_price() {
+        let price: f64 = get_price("dai").await.unwrap();
+        println!("The price of DAI is: ${}", price);
+        assert!(price >= 0.9);
+    }
+
+    #[tokio::test]
+    async fn test_matic_price() {
+        let price: f64 = get_price("matic").await.unwrap();
+        println!("The price of MATIC is: ${}", price);
+        assert!(price >= 0.5);
+    }
 }
