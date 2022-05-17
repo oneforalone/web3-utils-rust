@@ -9,7 +9,7 @@ use web3::contract::{Contract, Options};
 use web3::transports::WebSocket;
 use web3::types::{Address, U256};
 
-fn load_abi_json(json_file: &str) -> Result<String, std::io::Error> {
+fn load_json(json_file: &str) -> Result<String, std::io::Error> {
     let mut file = File::open(json_file).unwrap();
     let mut json_str = String::new();
     file.read_to_string(&mut json_str).unwrap();
@@ -19,7 +19,7 @@ fn load_abi_json(json_file: &str) -> Result<String, std::io::Error> {
 
 fn get_oracle_feeds(token: &str) -> Result<(String, String), Error> {
     let feeds_file = "chainlink-data-feeds.json";
-    let data = load_abi_json(feeds_file).unwrap();
+    let data = load_json(feeds_file).unwrap();
 
     let json: Value = serde_json::from_str(&data).unwrap();
     let addr: &str = json[token]["address"].as_str().unwrap();
@@ -39,7 +39,7 @@ async fn get_price(token: &str) -> Result<f64, web3::Error> {
 
     // get abi, cause include_bytes!() need take a string literal,
     // the macro works at compile time, can not take a variable as parameter
-    let abi_str = load_abi_json(abi_file.as_str()).unwrap();
+    let abi_str = load_json(abi_file.as_str()).unwrap();
     let abi = abi_str.as_bytes();
 
     let contract = Contract::from_json(web3.eth(), contract_addr, abi).unwrap();
